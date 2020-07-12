@@ -81,8 +81,8 @@ export default {
 			taskList: [],
 			checked: false,
 			showInputField: null,
-			todoId: null,
 			discardCache: {},
+			todoId: "",
 		};
 	},
 	components: {
@@ -93,43 +93,36 @@ export default {
 	},
 	methods: {
 		getTask() {
-			const currentPath = window.location.pathname;
-			this.todoId = parseInt(currentPath.replace("/taskeditor/", ""));
 			const taskList = JSON.parse(localStorage.getItem("tasks"));
+			const currentPath = window.location.pathname;
+			const todoId = currentPath.replace("/taskeditor/", "");
 			taskList.map((task) => {
-				if (this.todoId === task.id) {
+				if (task.id === todoId) {
 					this.taskListName = task.listName;
 					this.taskList = task.list;
+					this.todoId = todoId;
 				}
 			});
 		},
 		save() {
-			const tasksGroup = JSON.parse(localStorage.getItem("tasks"));
 			const todo = {
 				id: this.todoId,
 				listName: this.taskListName,
 				list: this.taskList,
 				bgColor: this.randomColor(),
 			};
-			if (isNaN(this.todoId)) {
-				todo.id = tasksGroup.length;
-				tasksGroup.push(todo);
-			} else {
-				tasksGroup.splice(this.todoId, 1, todo);
-			}
-			localStorage.setItem("tasks", JSON.stringify(tasksGroup));
+			this.$store.dispatch("saveTodo", { todo });
 			router.push({ path: "/" });
 		},
 		discard() {
-			this.discardCache = {
-				taskListName: this.taskListName,
-				taskList: this.taskList,
-			};
+			const { taskListName, taskList } = this;
+			this.$store.dispatch("discardTask", { taskListName, taskList });
 			this.getTask();
 		},
 		revert() {
-			this.taskListName = this.discardCache.taskListName;
-			this.taskList = this.discardCache.taskList;
+			const { taskListName, taskList } = this.$store.state.discardCache;
+			this.taskListName = taskListName;
+			this.taskList = taskList;
 		},
 		randomColor() {
 			const colors = [];
@@ -141,11 +134,10 @@ export default {
 		},
 		addTask() {
 			this.taskList.push({
-				id: this.taskList.length,
+				id: `task-${this.taskName}-${this.taskList.length}`,
 				name: this.taskName,
 				checked: false,
 			});
-			console.log(this.taskList);
 		},
 		removeTask() {
 			const taskId = event.target.getAttribute("data-task-id");
@@ -157,7 +149,6 @@ export default {
 					task.checked = !task.checked;
 				}
 			});
-			console.log(this.taskList);
 		},
 	},
 };
@@ -175,9 +166,6 @@ input {
 	}
 	&[type="checkbox"] {
 		margin-right: 30px;
-		& :checked {
-			text-decoration: line-through;
-		}
 	}
 }
 .add-task {

@@ -11,5 +11,6 @@ export const routes = [
 		path: "/taskeditor/:id",
 		name: "editor",
 		component: TaskEditor,
+		props: true,
 	},
 ];

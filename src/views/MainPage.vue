@@ -4,8 +4,8 @@
 			<app-button class="add-task" text="Add a new task"></app-button>
 		</router-link>
 		<div v-if="taskList" class="tasks-list">
-			<div v-for="(task, i) in taskList" :key="i">
-				<task-card :task="task"></task-card>
+			<div v-for="task in taskList" :key="task.id">
+				<task-card :task="task" @todoRemoved="() => getTasks()"></task-card>
 			</div>
 		</div>
 	</div>
@@ -24,9 +24,6 @@ export default {
 	methods: {
 		getTasks() {
 			this.taskList = JSON.parse(localStorage.getItem("tasks"));
-		},
-		logD(data) {
-			console.log(data);
 		},
 	},
 	mounted() {
@@ -54,12 +51,5 @@ export default {
 		background: darken($color: #29b6f6, $amount: 7);
 	}
 }
-a {
-	text-decoration: none;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 40px;
-	&:visited {
-		color: #263238;
-	}
-}
+
 </style>

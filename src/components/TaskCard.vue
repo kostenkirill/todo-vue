@@ -6,8 +6,16 @@
 				<li v-for="item in list" :key="item.id">{{ item.name }}</li>
 			</ol>
 			<div class="task-buttons">
-				<app-button text="Edit" @click.native="editTask"></app-button>
-				<!-- <app-button text="Remove" @click="deleteTask"></app-button> -->
+				<app-button
+					class="btn-edit"
+					text="Edit"
+					@click.native="editTask"
+				></app-button>
+				<app-button
+					class="btn-remove"
+					text="Remove"
+					@click.native="() => removeTodo(id)"
+				></app-button>
 			</div>
 		</div>
 	</div>
@@ -21,7 +29,7 @@ export default {
 	props: { task: { default: [] } },
 	data() {
 		return {
-			id: this.task.id,
+			id: `${this.task.id}`,
 			listName: this.task.listName,
 			list: this.task.list,
 			bgColor: this.task.bgColor,
@@ -30,11 +38,14 @@ export default {
 	components: { AppButton },
 	methods: {
 		editTask() {
-			router.push({ path: `/taskeditor/${this.id}` });
+			router.push({
+				path: `/taskeditor/${this.id}`,
+			});
 		},
-		// deleteTask(){
-			
-		// }
+		removeTodo(todoId) {
+			this.$store.dispatch("removeTodo", todoId);
+			this.$emit("todoRemoved");
+		},
 	},
 	mounted() {
 		if (this.list.length > 3) {
@@ -64,7 +75,9 @@ li {
 .task-buttons {
 	display: flex;
 	flex-direction: row;
-	& :first-child {
+}
+.btn {
+	&-edit {
 		background-color: #ffd54f;
 		font-size: 15px;
 		color: #263238;
