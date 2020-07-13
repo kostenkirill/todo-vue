@@ -1,5 +1,10 @@
 <template>
 	<div class="task-view" :style="{ backgroundColor: bgColor }">
+		<modal-window
+			text="Do you want to remove this task?"
+			v-model="modalOpen"
+			@confirm="removeTodo(id)"
+		></modal-window>
 		<div class="task-content">
 			<h3>{{ listName }}</h3>
 			<ol>
@@ -14,7 +19,7 @@
 				<app-button
 					class="btn-remove"
 					text="Remove"
-					@click.native="() => removeTodo(id)"
+					@click.native="openModal"
 				></app-button>
 			</div>
 		</div>
@@ -23,6 +28,7 @@
 
 <script>
 import AppButton from "./AppButton";
+import ModalWindow from "./ModalWindow";
 import { router } from "../router";
 export default {
 	name: "TaskCard",
@@ -33,10 +39,14 @@ export default {
 			listName: this.task.listName,
 			list: this.task.list,
 			bgColor: this.task.bgColor,
+			modalOpen: false,
 		};
 	},
-	components: { AppButton },
+	components: { AppButton, ModalWindow },
 	methods: {
+		openModal() {
+			this.modalOpen = !this.modalOpen;
+		},
 		editTask() {
 			router.push({
 				path: `/taskeditor/${this.id}`,
@@ -77,12 +87,19 @@ li {
 	flex-direction: row;
 }
 .btn {
+	font-size: 15px;
+	color: #263238;
 	&-edit {
 		background-color: #ffd54f;
-		font-size: 15px;
-		color: #263238;
 		&:hover {
 			background-color: darken($color: #ffd54f, $amount: 8);
+		}
+	}
+	&-remove {
+		background-color: #ff9e4f;
+		color: #263238;
+		&:hover {
+			background-color: darken($color: #ff9e4f, $amount: 8);
 		}
 	}
 }

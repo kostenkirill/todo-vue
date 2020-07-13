@@ -13,11 +13,13 @@ export const store = new Vuex.Store({
 				todo.id = `${todo.listName.replace(" ", "_")}-${todos.length}`;
 				todos.push(todo);
 			} else {
-				const todoIndex = todos.indexOf(todo);
+				const todoIndex = todos.findIndex(
+					(todoTask) => todoTask.id === todo.id
+				);
 				todos.splice(todoIndex, 1, todo);
 			}
 			state.todos = todos;
-			localStorage.setItem("tasks", JSON.stringify(todos));
+			localStorage.setItem("tasks", JSON.stringify(state.todos));
 		},
 		removeTodo(state, todoId) {
 			const todos = state.todos;
@@ -52,9 +54,5 @@ export const store = new Vuex.Store({
 			context.commit("setTodos", payload);
 		},
 	},
-	getters: {
-		getTasks() {
-			return this.$store.state.todos;
-		},
-	},
+	getters: {},
 });

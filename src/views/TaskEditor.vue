@@ -1,28 +1,27 @@
 <template>
 	<div class="task-details">
+		<modal-window
+			text="Do you want to discard changes and exit?"
+			v-model="modalOpen"
+			@confirm="exit"
+		></modal-window>
 		<div>
 			<h1>Editor</h1>
 			<h3>{{ taskListName }}</h3>
 			<div class="todo-list">
 				<div class="tasks-list" v-for="task in taskList" :key="task.id">
 					<div class="task-item">
-						<div class="">
-							<div @click="checkTask(task.id)">
-								<input
-									type="checkbox"
-									:name="task.name"
-									v-model="task.checked"
-								/>
-								<label :for="task.name">{{ task.name }}</label>
-							</div>
-							<input
-								type="text"
-								v-if="showInputField === task.id"
-								@blur="showInputField = null"
-								v-model="task.name"
-								placeholder="Edit"
-							/>
+						<div @click="checkTask(task.id)">
+							<input type="checkbox" :name="task.name" v-model="task.checked" />
+							<label :for="task.name">{{ task.name }}</label>
 						</div>
+						<input
+							type="text"
+							v-if="showInputField === task.id"
+							@blur="showInputField = null"
+							v-model="task.name"
+							placeholder="Edit"
+						/>
 						<div>
 							<app-button
 								text="Edit"
@@ -62,7 +61,12 @@
 				<app-button
 					class="btn-revert"
 					@click.native="revert"
-					text="Revert"
+					text="Revert changes"
+				></app-button>
+				<app-button
+					class="btn-exit"
+					@click.native="openModal"
+					text="Exit without saving"
 				></app-button>
 			</div>
 		</div>
@@ -72,6 +76,7 @@
 <script>
 import { router } from "../router";
 import AppButton from "../components/AppButton";
+import ModalWindow from "../components/ModalWindow";
 export default {
 	name: "TaskEditor",
 	data() {
@@ -83,15 +88,20 @@ export default {
 			showInputField: null,
 			discardCache: {},
 			todoId: "",
+			modalOpen: false,
 		};
 	},
 	components: {
 		AppButton,
+		ModalWindow,
 	},
 	mounted() {
 		this.getTask();
 	},
 	methods: {
+		openModal() {
+			this.modalOpen = !this.modalOpen;
+		},
 		getTask() {
 			const taskList = JSON.parse(localStorage.getItem("tasks"));
 			const currentPath = window.location.pathname;
@@ -124,6 +134,9 @@ export default {
 			this.taskListName = taskListName;
 			this.taskList = taskList;
 		},
+		exit() {
+			router.push("/");
+		},
 		randomColor() {
 			const colors = [];
 			for (let i = 0; i < 3; i++) {
@@ -141,7 +154,12 @@ export default {
 		},
 		removeTask() {
 			const taskId = event.target.getAttribute("data-task-id");
-			this.taskList.splice(taskId, 1);
+			this.taskList.map((task) => {
+				if (task.id === taskId) {
+					const taskIndex = this.taskList.indexOf(task);
+					this.taskList.splice(taskIndex, 1);
+				}
+			});
 		},
 		checkTask(checkedTaskId) {
 			this.taskList.map((task) => {
@@ -194,19 +212,45 @@ input {
 }
 .task-item {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	justify-content: space-between;
-	align-items: center;
 	width: 500px;
+	& div {
+		display: flex;
+		width: 300px;
+		& button {
+			color: #263238;
+			&:first-child {
+				background: #ffd54f;
+				&:hover {
+					background: darken($color: #ffd54f, $amount: 8);
+				}
+			}
+			&:last-child {
+				background: #ff9e4f;
+				&:hover {
+					background: darken($color: #ff9e4f, $amount: 8);
+				}
+			}
+		}
+	}
 }
 .btn {
 	font-size: 15px;
 	&-save,
-	&-add {
+	&-add,
+	&-discard,
+	&-revert {
 		background: #0277bd;
+		&:hover {
+			background: darken($color: #0277bd, $amount: 7);
+		}
 	}
-	&-discard {
+	&-exit {
 		background: #b71c1c;
+		&:hover {
+			background: darken($color: #b71c1c, $amount: 7);
+		}
 	}
 }
 </style>
