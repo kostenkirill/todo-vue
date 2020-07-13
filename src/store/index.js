@@ -1,5 +1,9 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import {
+	getItemFromLocalStorage,
+	setItemToLocalStorage,
+} from "../utils/functions";
 
 Vue.use(Vuex);
 
@@ -7,7 +11,7 @@ export const store = new Vuex.Store({
 	state: { todos: [], discardCache: {} },
 	mutations: {
 		saveTodo(state, payload) {
-			const todos = JSON.parse(localStorage.getItem("tasks"));
+			const todos = getItemFromLocalStorage("tasks");
 			const { todo } = payload;
 			if (todo.id === "") {
 				todo.id = `${todo.listName.replace(" ", "_")}-${todos.length}`;
@@ -19,7 +23,7 @@ export const store = new Vuex.Store({
 				todos.splice(todoIndex, 1, todo);
 			}
 			state.todos = todos;
-			localStorage.setItem("tasks", JSON.stringify(state.todos));
+			setItemToLocalStorage("tasks", state.todos);
 		},
 		removeTodo(state, todoId) {
 			const todos = state.todos;
@@ -30,29 +34,21 @@ export const store = new Vuex.Store({
 				}
 			});
 			state.todos = todos;
-			localStorage.setItem("tasks", JSON.stringify(state.todos));
-		},
-		setTodos(state, todos) {
-			state.todos = todos;
-			localStorage.setItem("tasks", JSON.stringify(state.todos));
+			setItemToLocalStorage("tasks", state.todos);
 		},
 		discardTask(state, payload) {
 			state.discardCache = payload;
 		},
 	},
 	actions: {
-		saveTodo(context, payload) {
+		SAVE_TODO(context, payload) {
 			context.commit("saveTodo", payload);
 		},
-		removeTodo(context, payload) {
+		REMOVE_TODO(context, payload) {
 			context.commit("removeTodo", payload);
 		},
-		discardTask(context, payload) {
+		DISCARD_TASK(context, payload) {
 			context.commit("discardTask", payload);
 		},
-		setTodos(context, payload) {
-			context.commit("setTodos", payload);
-		},
 	},
-	getters: {},
 });

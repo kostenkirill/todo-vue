@@ -14,6 +14,8 @@
 <script>
 import TaskCard from "../components/TaskCard";
 import AppButton from "../components/AppButton";
+import { getItemFromLocalStorage } from "../utils/functions";
+
 export default {
 	data() {
 		return {
@@ -23,7 +25,7 @@ export default {
 	components: { TaskCard, AppButton },
 	methods: {
 		getTasks() {
-			this.taskList = JSON.parse(localStorage.getItem("tasks"));
+			this.taskList = getItemFromLocalStorage("tasks");
 		},
 	},
 	mounted() {
@@ -51,5 +53,4 @@ export default {
 		background: darken($color: #29b6f6, $amount: 7);
 	}
 }
-
 </style>

@@ -7,6 +7,10 @@
 </template>
 
 <script>
+import {
+	getItemFromLocalStorage,
+	setItemToLocalStorage,
+} from "./utils/functions";
 export default {
 	name: "App",
 	mounted() {
@@ -14,9 +18,9 @@ export default {
 	},
 	methods: {
 		manageLocalStorage() {
-			const todos = JSON.parse(localStorage.getItem("tasks"));
+			const todos = getItemFromLocalStorage("tasks");
 			if (todos === null) {
-				localStorage.setItem("tasks", JSON.stringify([]));
+				setItemToLocalStorage("tasks", []);
 			}
 		},
 	},

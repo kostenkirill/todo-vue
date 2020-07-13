@@ -8,7 +8,7 @@
 		<div class="task-content">
 			<h3>{{ listName }}</h3>
 			<ol>
-				<li v-for="item in list" :key="item.id">{{ item.name }}</li>
+				<li v-for="item in list.slice(0, 3)" :key="item.id">{{ item.name }}</li>
 			</ol>
 			<div class="task-buttons">
 				<app-button
@@ -53,14 +53,9 @@ export default {
 			});
 		},
 		removeTodo(todoId) {
-			this.$store.dispatch("removeTodo", todoId);
+			this.$store.dispatch("REMOVE_TODO", todoId);
 			this.$emit("todoRemoved");
 		},
-	},
-	mounted() {
-		if (this.list.length > 3) {
-			this.list.length = 3;
-		}
 	},
 };
 </script>

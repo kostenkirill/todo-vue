@@ -77,6 +77,11 @@
 import { router } from "../router";
 import AppButton from "../components/AppButton";
 import ModalWindow from "../components/ModalWindow";
+import {
+	generateRandomColor,
+	getItemFromLocalStorage,
+} from "../utils/functions";
+
 export default {
 	name: "TaskEditor",
 	data() {
@@ -103,7 +108,7 @@ export default {
 			this.modalOpen = !this.modalOpen;
 		},
 		getTask() {
-			const taskList = JSON.parse(localStorage.getItem("tasks"));
+			const taskList = getItemFromLocalStorage("tasks");
 			const currentPath = window.location.pathname;
 			const todoId = currentPath.replace("/taskeditor/", "");
 			taskList.map((task) => {
@@ -115,18 +120,20 @@ export default {
 			});
 		},
 		save() {
-			const todo = {
-				id: this.todoId,
-				listName: this.taskListName,
-				list: this.taskList,
-				bgColor: this.randomColor(),
-			};
-			this.$store.dispatch("saveTodo", { todo });
-			router.push({ path: "/" });
+			if (!this.taskListName.match(/^$|\s+/)) {
+				const todo = {
+					id: this.todoId,
+					listName: this.taskListName,
+					list: this.taskList,
+					bgColor: generateRandomColor(),
+				};
+				this.$store.dispatch("SAVE_TODO", { todo });
+				router.push({ path: "/" });
+			}
 		},
 		discard() {
 			const { taskListName, taskList } = this;
-			this.$store.dispatch("discardTask", { taskListName, taskList });
+			this.$store.dispatch("DISCARD_TASK", { taskListName, taskList });
 			this.getTask();
 		},
 		revert() {
@@ -137,20 +144,14 @@ export default {
 		exit() {
 			router.push("/");
 		},
-		randomColor() {
-			const colors = [];
-			for (let i = 0; i < 3; i++) {
-				const color = Math.floor(Math.random() * 56) + 200;
-				colors.push(color);
-			}
-			return `rgb(${colors[0]},${colors[1]},${colors[2]})`;
-		},
 		addTask() {
-			this.taskList.push({
-				id: `task-${this.taskName}-${this.taskList.length}`,
-				name: this.taskName,
-				checked: false,
-			});
+			if (!this.taskName.match(/^$|\s+/)) {
+				this.taskList.push({
+					id: `task-${this.taskName}-${this.taskList.length}`,
+					name: this.taskName,
+					checked: false,
+				});
+			}
 		},
 		removeTask() {
 			const taskId = event.target.getAttribute("data-task-id");

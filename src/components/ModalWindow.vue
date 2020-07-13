@@ -63,6 +63,7 @@ export default {
 	& .btn {
 		font-size: 17px;
 		color: #dbe3e7;
+		width:100px;
 		&-confirm {
 			background-color: #0277bd;
 			&:hover {
