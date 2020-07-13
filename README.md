@@ -1,5 +1,10 @@
 # todo-vue
 
+## Live version
+```
+https://krll-todo-vue.netlify.app/
+```
+
 ## Project setup
 ```
 npm install
