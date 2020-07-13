@@ -120,7 +120,7 @@ export default {
 			});
 		},
 		save() {
-			if (!this.taskListName.match(/^$|\s+/)) {
+			if (this.taskListName.match(/^(?!\s*$).+/)) {
 				const todo = {
 					id: this.todoId,
 					listName: this.taskListName,
@@ -145,7 +145,7 @@ export default {
 			router.push("/");
 		},
 		addTask() {
-			if (!this.taskName.match(/^$|\s+/)) {
+			if (this.taskName.match(/^(?!\s*$).+/)) {
 				this.taskList.push({
 					id: `task-${this.taskName}-${this.taskList.length}`,
 					name: this.taskName,
